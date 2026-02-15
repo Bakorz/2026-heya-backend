@@ -1,4 +1,4 @@
-using CampusRooms.Api.Domain;
+using CampusRooms.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CampusRooms.Api.Data;
