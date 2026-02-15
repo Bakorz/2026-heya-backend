@@ -6,6 +6,7 @@ namespace CampusRooms.Api.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Room> Rooms => Set<Room>();
+    public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<BookingRequest> BookingRequests => Set<BookingRequest>();
     public DbSet<BookingOccurrence> BookingOccurrences => Set<BookingOccurrence>();
     public DbSet<ApprovalDecision> ApprovalDecisions => Set<ApprovalDecision>();
@@ -20,6 +21,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(x => x.Code).HasMaxLength(32).IsRequired();
             entity.Property(x => x.Name).HasMaxLength(128).IsRequired();
             entity.Property(x => x.Building).HasMaxLength(128).IsRequired();
+        });
+
+        modelBuilder.Entity<AppUser>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => x.Nrp).IsUnique();
+            entity.HasIndex(x => x.Email).IsUnique();
+            entity.Property(x => x.Name).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.Nrp).HasMaxLength(64).IsRequired();
+            entity.Property(x => x.Email).HasMaxLength(256).IsRequired();
+            entity.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
         });
 
         modelBuilder.Entity<BookingRequest>(entity =>
