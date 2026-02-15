@@ -41,6 +41,11 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 
+# Local runtime database files
+campusrooms.db
+*.db-shm
+*.db-wal
+
 # MSBuild Binary and Structured Log
 *.binlog
 
