@@ -8,6 +8,18 @@ namespace CampusRooms.Api.Controllers;
 [Route("api/auth")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    {
+        var result = await authService.LoginAsync(request);
+        if (!result.Success)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {

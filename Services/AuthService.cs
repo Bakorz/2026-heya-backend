@@ -7,6 +7,37 @@ namespace CampusRooms.Api.Services;
 
 public class AuthService(AppDbContext db) : IAuthService
 {
+    public async Task<ServiceResult<UserResponseDto>> LoginAsync(LoginRequestDto request)
+    {
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return ServiceResult<UserResponseDto>.Fail("Email is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            return ServiceResult<UserResponseDto>.Fail("Password is required.");
+        }
+
+        var user = await db.Users.FirstOrDefaultAsync(x => x.Email == email);
+        if (user is null || !PasswordHasher.Verify(request.Password, user.PasswordHash))
+        {
+            return ServiceResult<UserResponseDto>.Fail("Invalid email or password.");
+        }
+
+        return ServiceResult<UserResponseDto>.Ok(new UserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Nrp = user.Nrp,
+            Email = user.Email,
+            Role = user.Role,
+            CreatedAtUtc = user.CreatedAtUtc
+        });
+    }
+
     public async Task<ServiceResult<UserResponseDto>> RegisterAsync(RegisterUserRequestDto request)
     {
         var name = request.Name.Trim();

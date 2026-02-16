@@ -138,6 +138,33 @@ public class RequestService(AppDbContext db) : IRequestService
         return ServiceResult<BookingRequestResponseDto>.Ok(bookingRequest.ToDto());
     }
 
+    public async Task<ServiceResult<bool>> DeleteRequestAsync(Guid requestId, string actor)
+    {
+        var request = await db.BookingRequests
+            .Include(x => x.Room)
+            .FirstOrDefaultAsync(x => x.Id == requestId);
+
+        if (request is null)
+        {
+            return ServiceResult<bool>.NotFoundResult();
+        }
+
+        db.BookingRequests.Remove(request);
+        db.AuditEvents.Add(new AuditEvent
+        {
+            Id = Guid.NewGuid(),
+            EntityType = "BookingRequest",
+            EntityId = requestId,
+            EventType = "Deleted",
+            Actor = string.IsNullOrWhiteSpace(actor) ? "admin" : actor.Trim(),
+            Details = $"Deleted request for room {(request.Room?.Name ?? request.RoomId.ToString())}",
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        await db.SaveChangesAsync();
+        return ServiceResult<bool>.Ok(true);
+    }
+
     private static bool IsWithinWorkingHours(DateTime startUtc, DateTime endUtc)
     {
         var start = TimeOnly.FromDateTime(startUtc);

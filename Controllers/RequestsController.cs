@@ -32,4 +32,21 @@ public class RequestsController(IRequestService requestService) : ControllerBase
 
         return Created($"/api/requests/{result.Value!.Id}", result.Value);
     }
+
+    [HttpDelete("{requestId:guid}")]
+    public async Task<IActionResult> DeleteRequest(Guid requestId, [FromQuery] string actor = "admin")
+    {
+        var result = await requestService.DeleteRequestAsync(requestId, actor);
+        if (result.NotFound)
+        {
+            return NotFound();
+        }
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return NoContent();
+    }
 }
