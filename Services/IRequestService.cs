@@ -13,4 +13,6 @@ public interface IRequestService
         bool desc);
 
     Task<ServiceResult<BookingRequestResponseDto>> CreateRequestAsync(CreateBookingRequestDto request);
+
+    Task<ServiceResult<bool>> DeleteRequestAsync(Guid requestId, string actor);
 }
